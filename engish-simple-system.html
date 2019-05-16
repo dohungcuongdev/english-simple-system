@@ -1,0 +1,45 @@
+
+
+<input type="file" name="file" id="file">
+<hr>
+
+<style>
+a {
+	display: block;
+}
+</style>
+
+
+<script>
+const ggTranslateBaseURL = 'https://translate.google.com/#view=home&op=translate&sl=en&tl=vi&text=';
+
+document.getElementById('file').onchange = function() {
+
+  var file = this.files[0];
+
+  var reader = new FileReader();
+  reader.onload = function(progressEvent){
+    // Entire file
+    console.log(this.result);
+
+    // By lines
+    var lines = this.result.split('\n');
+    for(var line = 0; line < lines.length; line++){
+      //console.log(lines[line]);
+	  createHTMLWord(lines[line]);
+    }
+  };
+  reader.readAsText(file);
+};
+
+
+function createHTMLWord(word) {
+	var a = document.createElement('a');
+	var linkText = document.createTextNode(word);
+	a.appendChild(linkText);
+	a.title = word;
+	a.href = ggTranslateBaseURL + word;
+	a.target = '_blank';
+	document.body.appendChild(a);
+}
+</script>
