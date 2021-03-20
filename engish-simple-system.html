@@ -1,5 +1,10 @@
-
-
+Select Option
+<select id="selectThirdParty" onchange="selectThirdParty()">
+	<option value="ggTranslate">Google Translate</option>
+	<option value="dictionaryCambridge">Cambridge Dictionary</option>
+	<option value="dictionaryOxford">Oxford Dictionary</option>
+</select>
+<!-- <button onclick="location.reload();">Refresh</button> -->
 <input type="file" name="file" id="file">
 <hr>
 
@@ -13,6 +18,13 @@ a {
 <script>
 const ggTranslateBaseURL = 'https://translate.google.com/#view=home&op=translate&sl=en&tl=vi&text=';
 
+const dictionaryCambridgeBaseURL = 'https://dictionary.cambridge.org/dictionary/english/';
+
+const dictionaryOxfordBaseURL = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
+
+var thirdPartyUrl = ggTranslateBaseURL;
+var lastWordIdSeq = 0; 
+
 document.getElementById('file').onchange = function() {
 
   var file = this.files[0];
@@ -21,25 +33,51 @@ document.getElementById('file').onchange = function() {
   reader.onload = function(progressEvent){
     // Entire file
     console.log(this.result);
+	
+	var divVocabulary = document.getElementById("vocabulary");
+	if(divVocabulary) {
+		divVocabulary.remove();
+	}
+	var newDivVocabulary = document.createElement('div');
+	newDivVocabulary.id = 'vocabulary';
+	document.body.appendChild(newDivVocabulary);
 
     // By lines
     var lines = this.result.split('\n');
     for(var line = 0; line < lines.length; line++){
       //console.log(lines[line]);
-	  createHTMLWord(lines[line]);
+	  createHTMLWord(newDivVocabulary, line, lines[line]);
     }
+	lastWordIdSeq = lines.length - 1;
   };
   reader.readAsText(file);
 };
 
 
-function createHTMLWord(word) {
-	var a = document.createElement('a');
+function createHTMLWord(divVocabulary, idSeq, word) {
+	var aWord = document.createElement('a');
 	var linkText = document.createTextNode(word);
-	a.appendChild(linkText);
-	a.title = word;
-	a.href = ggTranslateBaseURL + word;
-	a.target = '_blank';
-	document.body.appendChild(a);
+	aWord.appendChild(linkText);
+	aWord.title = word;
+	aWord.href = thirdPartyUrl + word;
+	aWord.target = '_blank';
+	aWord.id = 'word' + idSeq;
+	divVocabulary.appendChild(aWord);
+}
+
+function selectThirdParty() {
+  var thirdParty = document.getElementById("selectThirdParty").value;
+  if(thirdParty === 'ggTranslate') {
+	thirdPartyUrl = ggTranslateBaseURL;
+  } else if(thirdParty === 'dictionaryCambridge') {
+	thirdPartyUrl = dictionaryCambridgeBaseURL;
+  } else if(thirdParty === 'dictionaryOxford') {
+	thirdPartyUrl = dictionaryOxfordBaseURL;
+  }
+  
+  for(var idSeq = 0; idSeq < lastWordIdSeq; idSeq++) {
+	var aWord = document.getElementById("word"+idSeq);
+	aWord.href = thirdPartyUrl + aWord.title;
+  }
 }
 </script>
